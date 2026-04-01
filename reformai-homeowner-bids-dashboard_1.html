@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reform-A.i | Bids — Commercial Test 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:      #00ADB5;
+      --teal-dark: #009AA2;
+      --border:    #e5e5e5;
+      --muted:     #737373;
+      --text:      #0a0a0a;
+      --bg:        #ffffff;
+      --surface:   #fafafa;
+      --surface-2: #f5f5f5;
+      --danger:    #e40014;
+      --sidebar-w: 248px;
+      --topbar-h:  64px;
+    }
+
+    html, body { height: 100%; font-family: 'Red Hat Display', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+    /* ── TOPBAR ── */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h); background: var(--bg); border-bottom: 0.625px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 18px; z-index: 100; }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .ti { width: 18px; height: 18px; color: #6b7280; cursor: pointer; opacity: 0.8; transition: opacity 0.15s; }
+    .ti:hover { opacity: 1; }
+    .user-chip { display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.12s; }
+    .user-chip:hover { background: var(--surface-2); }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--bg); border-right: 1.875px solid var(--border); position: fixed; top: var(--topbar-h); bottom: 0; left: 0; overflow-y: auto; padding: 16px 0 32px; }
+    .nav-lbl { display: block; font-size: 14px; font-weight: 600; color: var(--muted); padding: 10px 18px 6px; }
+    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; text-decoration: none; transition: background 0.1s; border-radius: 6px; margin: 1px 8px; }
+    .nav-item:hover { background: var(--surface-2); }
+    .nav-item.active { background: var(--surface-2); font-weight: 700; }
+    .nav-item.disabled { color: #a1a1a1; cursor: default; margin: 1px 8px; padding: 8px 18px; display: flex; align-items: center; gap: 10px; }
+    .nav-item.disabled:hover { background: transparent; }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; color: #374151; }
+    .nav-item.disabled .nav-icon { color: #c4c4c4; }
+    .nav-chevron { width: 14px; height: 14px; color: #a1a1a1; flex-shrink: 0; }
+    .nav-divider { border: none; border-top: 1px solid var(--border); margin: 8px 14px; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; }
+
+    /* ── HERO ── */
+    .hero { position: relative; height: 250px; overflow: hidden; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.15) 100%); }
+    .edit-cover-btn { position: absolute; bottom: 14px; right: 16px; padding: 7px 14px; background: rgba(255,255,255,0.92); border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; font-family: inherit; transition: background 0.12s; }
+    .edit-cover-btn:hover { background: #fff; }
+
+    /* ── PROJECT HEADER ── */
+    .project-header { padding: 18px 28px 0; display: flex; align-items: center; gap: 12px; }
+    .project-name { font-size: 20px; font-weight: 700; color: var(--text); }
+    .active-badge { display: inline-flex; align-items: center; padding: 3px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; font-size: 12px; font-weight: 500; color: #15803d; }
+
+    /* ── TAB NAV ── */
+    .tab-nav { display: flex; border-bottom: 1px solid var(--border); margin: 16px 0 0; padding: 0 28px; gap: 2px; }
+    .tab { padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-radius: 7px 7px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.12s; text-decoration: none; font-family: inherit; background: none; }
+    .tab:hover { color: var(--text); background: var(--surface); }
+    .tab.active { background: var(--bg); border-color: var(--border); color: var(--text); font-weight: 600; margin-bottom: -1px; }
+
+    /* ── BIDS CONTENT ── */
+    .bids-content { padding: 20px 28px 80px; }
+
+    /* ── SHORTLIST BANNER ── */
+    .shortlist-banner { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; margin-bottom: 16px; }
+    .shortlist-left { display: flex; align-items: center; gap: 9px; font-size: 13px; color: #1d4ed8; font-weight: 500; }
+    .shortlist-icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .shortlist-badge { background: #1d4ed8; color: white; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+
+    /* ── CONTROLS ROW ── */
+    .controls-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .search-wrap { position: relative; flex: 1; max-width: 320px; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #a1a1a1; pointer-events: none; }
+    .search-input { width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 12px 0 32px; font-size: 13px; font-family: inherit; color: var(--text); outline: none; transition: border-color 0.15s; }
+    .search-input::placeholder { color: #a1a1a1; }
+    .search-input:focus { border-color: var(--teal); }
+    .filter-btn { display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); background: var(--bg); cursor: pointer; white-space: nowrap; font-family: inherit; transition: background 0.12s; }
+    .filter-btn:hover { background: var(--surface-2); }
+    .filter-btn svg { width: 13px; height: 13px; color: var(--muted); }
+
+    /* ── TRADE GROUP ── */
+    .trade-group { margin-bottom: 24px; }
+    .trade-group-header { display: flex; align-items: center; gap: 10px; padding: 10px 0 8px; }
+    .trade-group-label { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; }
+    .trade-group-count { font-size: 12px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+    .trade-divider { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── BID TABLE ── */
+    .bid-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .bid-table th { font-size: 12px; font-weight: 600; color: var(--muted); text-align: left; padding: 9px 14px; background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .bid-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .bid-table tbody tr:last-child td { border-bottom: none; }
+    .bid-table tbody tr:hover td { background: #fafcff; }
+
+    /* Provider */
+    .provider-cell { display: flex; align-items: center; gap: 10px; }
+    .provider-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .provider-name { font-size: 13px; font-weight: 600; color: #1a56db; cursor: pointer; }
+    .provider-name:hover { text-decoration: underline; }
+    .provider-company { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    /* Custom service tag — shown in Other group */
+    .service-tag { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; font-size: 11px; font-weight: 500; color: #0e7490; background: #ecfeff; border: 1px solid #a5f3fc; padding: 2px 7px; border-radius: 4px; }
+
+    /* Rate */
+    .rate-main { font-size: 13px; font-weight: 600; color: var(--text); }
+    .rate-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Tier badges */
+    .tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .tier-budget  { background: var(--surface-2); color: #555; border: 1px solid var(--border); }
+    .tier-mid     { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .tier-premium { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .tier-luxury  { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+    /* Availability */
+    .avail-badge { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--surface-2); color: #555; border: 1px solid var(--border); white-space: nowrap; }
+
+    /* Status */
+    .status-pending     { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; white-space: nowrap; }
+    .status-shortlisted { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; white-space: nowrap; }
+
+    /* Stars */
+    .stars { display: flex; align-items: center; gap: 1px; font-size: 13px; color: #f59e0b; white-space: nowrap; }
+    .star-empty { color: var(--border); }
+    .star-count { font-size: 11px; color: var(--muted); margin-left: 3px; }
+
+    /* Schedule button */
+    .btn-schedule { padding: 6px 14px; background: #374151; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; transition: background 0.12s; }
+    .btn-schedule:hover:not(.done) { background: #1f2937; }
+    .btn-schedule.done { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; cursor: default; }
+
+    /* Open button */
+    .btn-open { padding: 6px 12px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; white-space: nowrap; transition: background 0.12s; }
+    .btn-open:hover { background: var(--surface-2); }
+
+    /* Thumbs */
+    .thumb-row { display: flex; align-items: center; gap: 6px; }
+    .thumb { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--bg); font-size: 14px; transition: all 0.12s; user-select: none; }
+    .thumb:hover { background: var(--surface-2); }
+    .thumb.up.active  { background: #f0fdf4; border-color: #bbf7d0; }
+    .thumb.down.active{ background: #fef2f2; border-color: #fecaca; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <a href="#" style="text-decoration:none; display:flex; align-items:center;">
+    <svg width="158" height="42" viewBox="0 0 390 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35 5L57 18V44L35 57L13 44V18Z" fill="#7BADB8"/>
+      <path d="M35 5L57 18L46 24V12Z" fill="#B0D4DC"/>
+      <path d="M57 18V44L46 38V24Z" fill="#5A93A2"/>
+      <path d="M35 14L51 23V41L35 50L19 41V23Z" fill="#4A8694"/>
+      <path d="M35 22L46 28V38L35 44L24 38V28Z" fill="#2d3748"/>
+      <path d="M27 41L32 24L35 31L38 24L43 41H39.5L35 31L30.5 41Z" fill="white"/>
+      <rect x="30.5" y="33" width="9" height="2.5" fill="#2d3748"/>
+      <circle cx="35" cy="23" r="2.2" fill="#6DB5C0"/>
+      <rect x="33.5" y="41" width="3" height="6" rx="1.5" fill="#6DB5C0"/>
+      <text x="70" y="38" font-family="'Red Hat Display', sans-serif" font-size="27" font-weight="700" fill="#2d3748" letter-spacing="-0.5">Reform-A.i</text>
+      <text x="70" y="53" font-family="'Red Hat Display', sans-serif" font-size="8.5" font-weight="400" fill="#9ca3af" letter-spacing="1.8">RENOVATION MADE EASY</text>
+    </svg>
+  </a>
+  <div class="topbar-right">
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <div class="user-chip">
+      <svg width="22" height="22" viewBox="0 0 100 100" fill="none"><path d="M50 8C28 8 12 26 18 46C22 60 14 72 6 78C20 83 36 76 46 64C48 68 49 75 49 82C50 75 51 68 53 64C63 76 79 83 93 78C85 72 77 60 81 46C87 26 71 8 50 8Z" fill="#7B2D2D"/></svg>
+      <span class="user-name">CJ Leazer</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR (homeowner nav) ── -->
+  <nav class="sidebar">
+    <span class="nav-lbl">General</span>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Find a Home</div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="nav-item active" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>My Properties</div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Reform-Ai</div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>My AI Visuals</div>
+    </a>
+    <div class="nav-item disabled">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      Inspiration Hub
+    </div>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Find a Pro</div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Partnered Projects</div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <hr class="nav-divider">
+    <span class="nav-lbl">Profile Management</span>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>Subscription</div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finances &amp; Billing</div>
+    </a>
+    <hr class="nav-divider">
+    <span class="nav-lbl">Project Management</span>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My Projects</div>
+    </a>
+    <hr class="nav-divider">
+    <span class="nav-lbl">Help &amp; Contact</span>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help Center</div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>FAQs</div>
+    </a>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1400" alt="Commercial Test 1 property">
+      <div class="hero-overlay"></div>
+      <button class="edit-cover-btn">Edit cover</button>
+    </div>
+
+    <!-- Project title -->
+    <div class="project-header">
+      <div class="project-name">Commercial Test 1</div>
+      <span class="active-badge">Active</span>
+    </div>
+
+    <!-- Tab nav -->
+    <div class="tab-nav">
+      <button class="tab">Overview</button>
+      <button class="tab">Inspiration &amp; Visualizations</button>
+      <button class="tab active">Bids</button>
+      <button class="tab">Timeline &amp; Progress</button>
+      <button class="tab">Agreements &amp; Invoices</button>
+    </div>
+
+    <!-- Bids content -->
+    <div class="bids-content">
+
+      <!-- Shortlist banner -->
+      <div class="shortlist-banner">
+        <div class="shortlist-left">
+          <svg class="shortlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          You can only shortlist up to 2 contractors per trade
+        </div>
+        <span class="shortlist-badge">0 / 2</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-row">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" class="search-input" placeholder="Search by name, price, service…">
+        </div>
+        <button class="filter-btn">
+          Filter by <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <button class="filter-btn">
+          Sort by <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+
+      <!-- ── FLOORING & TILING ── -->
+      <div class="trade-group">
+        <div class="trade-group-header">
+          <span class="trade-group-label">◼ Flooring &amp; Tiling</span>
+          <span class="trade-group-count">3 bids</span>
+          <div class="trade-divider"></div>
+        </div>
+        <table class="bid-table">
+          <thead><tr>
+            <th>Service Provider</th><th>Rate / m²</th><th>Est. Total (120 m²)</th>
+            <th>Tier</th><th>Availability</th><th>Rating</th>
+            <th>Status</th><th>Walkthrough</th><th>Decisions</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#7c3aed;">C</div><div><div class="provider-name">Chuck Leazer</div><div class="provider-company">Chuck's General Contracting</div></div></div></td>
+              <td><div class="rate-main">COP$ 700k – 1M</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 84M – 120M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-mid">Mid-range</span></td>
+              <td><span class="avail-badge">Within 2 weeks</span></td>
+              <td><div class="stars">★★★★★<span class="star-count">5.0</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#0891b2;">T</div><div><div class="provider-name">TileFit Pro</div><div class="provider-company">TileFit Solutions SAS</div></div></div></td>
+              <td><div class="rate-main">COP$ 500k – 650k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 60M – 78M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-budget">Budget</span></td>
+              <td><span class="avail-badge">2–4 weeks</span></td>
+              <td><div class="stars">★★★★<span class="star-empty">★</span><span class="star-count">4.1</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#b45309;">L</div><div><div class="provider-name">Luxe Floors CO</div><div class="provider-company">Luxe Interiors Group</div></div></div></td>
+              <td><div class="rate-main">COP$ 1.1M – 1.4M</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 132M – 168M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-premium">Premium</span></td>
+              <td><span class="avail-badge">1–2 months</span></td>
+              <td><div class="stars">★★★★★<span class="star-count">4.8</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── PLUMBING ── -->
+      <div class="trade-group">
+        <div class="trade-group-header">
+          <span class="trade-group-label">🔧 Plumbing</span>
+          <span class="trade-group-count">2 bids</span>
+          <div class="trade-divider"></div>
+        </div>
+        <table class="bid-table">
+          <thead><tr>
+            <th>Service Provider</th><th>Rate / m²</th><th>Est. Total (120 m²)</th>
+            <th>Tier</th><th>Availability</th><th>Rating</th>
+            <th>Status</th><th>Walkthrough</th><th>Decisions</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#059669;">A</div><div><div class="provider-name">AquaFix Solutions</div><div class="provider-company">AquaFix SAS</div></div></div></td>
+              <td><div class="rate-main">COP$ 400k – 500k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 48M – 60M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-mid">Mid-range</span></td>
+              <td><span class="avail-badge">Within 2 weeks</span></td>
+              <td><div class="stars">★★★★<span class="star-empty">★</span><span class="star-count">4.3</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#475569;">P</div><div><div class="provider-name">PipePro</div><div class="provider-company">PipePro Colombia</div></div></div></td>
+              <td><div class="rate-main">COP$ 280k – 380k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 33.6M – 45.6M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-budget">Budget</span></td>
+              <td><span class="avail-badge">Flexible</span></td>
+              <td><div class="stars">★★★<span class="star-empty">★★</span><span class="star-count">3.8</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── ELECTRICAL ── -->
+      <div class="trade-group">
+        <div class="trade-group-header">
+          <span class="trade-group-label">⚡ Electrical</span>
+          <span class="trade-group-count">1 bid</span>
+          <div class="trade-divider"></div>
+        </div>
+        <table class="bid-table">
+          <thead><tr>
+            <th>Service Provider</th><th>Rate / m²</th><th>Est. Total (120 m²)</th>
+            <th>Tier</th><th>Availability</th><th>Rating</th>
+            <th>Status</th><th>Walkthrough</th><th>Decisions</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="provider-cell"><div class="provider-avatar" style="background:#1d4ed8;">E</div><div><div class="provider-name">EliteElec Co.</div><div class="provider-company">EliteElec Colombia SAS</div></div></div></td>
+              <td><div class="rate-main">COP$ 250k – 320k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 30M – 38.4M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-mid">Mid-range</span></td>
+              <td><span class="avail-badge">2–4 weeks</span></td>
+              <td><div class="stars">★★★★★<span class="star-count">4.7</span></div></td>
+              <td><span class="status-shortlisted">Shortlisted</span></td>
+              <td><button class="btn-schedule done">Scheduled ✓</button></td>
+              <td><div class="thumb-row"><div class="thumb up active" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── OTHER (custom write-in services) ── -->
+      <div class="trade-group">
+        <div class="trade-group-header">
+          <span class="trade-group-label">✏️ Other</span>
+          <span class="trade-group-count">2 bids</span>
+          <div class="trade-divider"></div>
+        </div>
+        <table class="bid-table">
+          <thead><tr>
+            <th>Service Provider</th><th>Rate / m²</th><th>Est. Total (120 m²)</th>
+            <th>Tier</th><th>Availability</th><th>Rating</th>
+            <th>Status</th><th>Walkthrough</th><th>Decisions</th>
+          </tr></thead>
+          <tbody>
+            <!-- Smart Home Installation -->
+            <tr>
+              <td>
+                <div class="provider-cell">
+                  <div class="provider-avatar" style="background:#0e7490;">S</div>
+                  <div>
+                    <div class="provider-name">SmartNest Colombia</div>
+                    <div class="provider-company">SmartNest Tech SAS</div>
+                    <div class="service-tag">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                      Smart Home Installation
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="rate-main">COP$ 320k – 480k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 38.4M – 57.6M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-premium">Premium</span></td>
+              <td><span class="avail-badge">2–4 weeks</span></td>
+              <td><div class="stars">★★★★<span class="star-empty">★</span><span class="star-count">4.4</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+            <!-- Acoustic Treatment -->
+            <tr>
+              <td>
+                <div class="provider-cell">
+                  <div class="provider-avatar" style="background:#6d28d9;">A</div>
+                  <div>
+                    <div class="provider-name">AcoustiKa Studio</div>
+                    <div class="provider-company">AcoustiKa Diseño SAS</div>
+                    <div class="service-tag">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                      Acoustic Treatment &amp; Soundproofing
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="rate-main">COP$ 450k – 620k</div><div class="rate-sub">per m²</div></td>
+              <td><div class="rate-main">COP$ 54M – 74.4M</div><div class="rate-sub">estimate</div></td>
+              <td><span class="tier-badge tier-mid">Mid-range</span></td>
+              <td><span class="avail-badge">1–2 months</span></td>
+              <td><div class="stars">★★★★★<span class="star-count">4.9</span></div></td>
+              <td><span class="status-pending">Pending</span></td>
+              <td><button class="btn-schedule" onclick="scheduleToggle(this)">Schedule</button></td>
+              <td><div class="thumb-row"><div class="thumb up" onclick="thumbToggle(this,'up')">👍</div><div class="thumb down" onclick="thumbToggle(this,'down')">👎</div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /bids-content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+  function scheduleToggle(btn) {
+    if (btn.classList.contains('done')) return;
+    btn.textContent = 'Scheduled ✓';
+    btn.classList.add('done');
+  }
+
+  function thumbToggle(el, type) {
+    const row = el.closest('.thumb-row');
+    const opposite = type === 'up' ? 'down' : 'up';
+    const oppositeEl = row.querySelector('.thumb.' + opposite);
+
+    if (el.classList.contains('active')) {
+      el.classList.remove('active');
+    } else {
+      el.classList.add('active');
+      oppositeEl.classList.remove('active');
+    }
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Search filter (simple client-side)
+  document.querySelector('.search-input').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.bid-table tbody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(q) ? '' : 'none';
+    });
+  });
+</script>
+</body>
+</html>

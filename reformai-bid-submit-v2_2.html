@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reform-A.i | Submit Interest — Apt 4B, Torre Alianza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #00ADB5;
+      --teal-dark: #009AA2;
+      --border: #e5e5e5;
+      --muted: #737373;
+      --text: #0a0a0a;
+      --bg: #ffffff;
+      --surface: #fafafa;
+      --surface-2: #f5f5f5;
+      --danger: #e40014;
+      --radius-card: 10px;
+      --radius-btn: 8px;
+      --radius-input: 8px;
+      --sidebar-width: 248px;
+      --topbar-height: 64px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Red Hat Display', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LAYOUT SHELL ──────────────────────────────── */
+    .layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .body-row { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── TOPBAR ────────────────────────────────────── */
+    .topbar {
+      height: var(--topbar-height);
+      background: var(--bg);
+      border-bottom: 0.625px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px 0 18px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .topbar-icon { width: 18px; height: 18px; color: #6b7280; cursor: pointer; opacity: 0.8; transition: opacity 0.15s; }
+    .topbar-icon:hover { opacity: 1; }
+    .user-chip { display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.12s; }
+    .user-chip:hover { background: var(--surface-2); }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .user-caret { width: 12px; height: 12px; color: #9ca3af; }
+
+    /* ── SIDEBAR ───────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      background: var(--bg);
+      border-right: 1.875px solid var(--border);
+      padding: 16px 0 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav-section { margin-bottom: 4px; }
+    .nav-section-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 10px 18px 6px;
+      line-height: 1;
+    }
+    .nav-divider { border: none; border-top: 1px solid var(--border); margin: 8px 14px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.1s;
+      border-radius: 6px;
+      margin: 1px 8px;
+    }
+    .nav-item:hover { background: var(--surface-2); }
+    .nav-item.active { font-weight: 700; background: var(--surface-2); }
+    .nav-item.disabled { color: #a1a1a1; cursor: default; }
+    .nav-item.disabled:hover { background: transparent; }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; color: #374151; }
+    .nav-item.disabled .nav-icon { color: #c4c4c4; }
+    .nav-chevron { margin-left: auto; width: 14px; height: 14px; color: #a1a1a1; }
+
+    /* ── MAIN ──────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .page-header {
+      padding: 20px 32px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+    .page-actions { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 8px 20px;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Red Hat Display', sans-serif;
+      cursor: pointer;
+      transition: all 0.12s;
+      border: none;
+    }
+    .btn-cancel {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-cancel:hover { background: var(--surface-2); }
+    .btn-send {
+      background: #374151;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .btn-send:hover { background: #1f2937; }
+    .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── CONTENT AREA ──────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 32px 80px;
+    }
+
+    /* ── CARDS ─────────────────────────────────────── */
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .card-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .card-label-meta { font-size: 12px; font-weight: 400; color: var(--muted); }
+    .card-body { padding: 18px 20px; }
+    .optional-badge {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 1px 8px;
+      border-radius: 4px;
+    }
+    .req { color: var(--danger); }
+
+    /* ── PROPERTY ROW ──────────────────────────────── */
+    .prop-row { display: flex; align-items: flex-start; gap: 20px; }
+    .prop-img-wrap { position: relative; flex-shrink: 0; }
+    .prop-img {
+      width: 152px;
+      height: 112px;
+      border-radius: 8px;
+      object-fit: cover;
+      display: block;
+      background: var(--surface-2);
+    }
+    .area-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.58);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      letter-spacing: 0.02em;
+      font-family: 'Red Hat Display', sans-serif;
+    }
+    .prop-info { display: flex; flex-direction: column; gap: 5px; padding-top: 2px; }
+    .prop-name { font-size: 16px; font-weight: 600; color: var(--text); }
+    .prop-type { font-size: 13px; color: var(--muted); }
+    .prop-address { display: flex; align-items: flex-start; gap: 5px; }
+    .prop-address-text { font-size: 13px; color: var(--muted); line-height: 1.35; }
+    .prop-area-row { display: flex; align-items: center; gap: 5px; }
+    .prop-area-text { font-size: 13px; font-weight: 500; color: var(--text); }
+    .icon-sm { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+    .prop-owner { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+    .prop-owner-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    /* ── FIELDS ────────────────────────────────────── */
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 8px; display: block; }
+    .field-hint { font-size: 12px; color: var(--muted); margin-top: 7px; }
+    .field-error { font-size: 12px; color: var(--danger); margin-top: 5px; display: none; }
+    .field-error.show { display: block; }
+
+    /* ── TRADE TILE GRID ───────────────────────────── */
+    .trade-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tier-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .tile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+      user-select: none;
+      font-family: 'Red Hat Display', sans-serif;
+    }
+    .tile:hover { border-color: #a1a1a1; color: var(--text); }
+    .tile.selected {
+      border-color: var(--teal);
+      background: #f0fbfb;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .tile-center {
+      display: block;
+      text-align: center;
+      padding: 10px 6px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+      user-select: none;
+      font-family: 'Red Hat Display', sans-serif;
+    }
+    .tile-center:hover { border-color: #a1a1a1; color: var(--text); }
+    .tile-center.selected {
+      border-color: var(--teal);
+      background: #f0fbfb;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .tile-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+
+    /* ── ADD YOUR SERVICE ──────────────────────────── */
+    .custom-tiles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .custom-tile {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px 7px 12px;
+      border: 1px solid var(--teal);
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: #f0fbfb;
+      font-family: 'Red Hat Display', sans-serif;
+    }
+    .remove-btn {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 2px;
+      color: #9ca3af;
+      transition: color 0.12s;
+      flex-shrink: 0;
+    }
+    .remove-btn:hover { color: var(--danger); }
+    .add-service-row { display: flex; gap: 8px; margin-top: 10px; }
+    .add-service-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      font-size: 13px;
+      font-family: 'Red Hat Display', sans-serif;
+      color: var(--text);
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      min-width: 0;
+    }
+    .add-service-input:focus { border-color: var(--teal); }
+    .add-service-input::placeholder { color: #a1a1a1; }
+    .btn-add {
+      padding: 9px 16px;
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--teal);
+      border: none;
+      cursor: pointer;
+      font-family: 'Red Hat Display', sans-serif;
+      white-space: nowrap;
+      transition: background 0.12s;
+      flex-shrink: 0;
+    }
+    .btn-add:hover { background: var(--teal-dark); }
+
+    /* ── RATE INPUTS ───────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sub-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .prefix-wrap {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .prefix-wrap:focus-within { border-color: var(--teal); }
+    .prefix {
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      font-family: 'Red Hat Display', sans-serif;
+    }
+    .prefix-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: 'Red Hat Display', sans-serif;
+      color: var(--text);
+      padding: 0 12px;
+      height: 42px;
+      background: transparent;
+    }
+    .prefix-input::placeholder { color: #a1a1a1; }
+
+
+    /* ── TEXTAREA ──────────────────────────────────── */
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      font-size: 14px;
+      font-family: 'Red Hat Display', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      padding: 10px 14px;
+      outline: none;
+      resize: none;
+      height: 88px;
+      line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+    .textarea:focus { border-color: var(--teal); }
+    .textarea::placeholder { color: #a1a1a1; }
+    .char-count { display: flex; justify-content: flex-end; font-size: 12px; color: #a1a1a1; margin-top: 5px; }
+
+    /* ── UNLOCK BANNER ─────────────────────────────── */
+    .unlock-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1.5px dashed #d4d4d4;
+      border-radius: var(--radius-btn);
+      background: var(--surface);
+      margin-bottom: 16px;
+    }
+    .unlock-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .unlock-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .unlock-body { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    /* ── SUCCESS MODAL ─────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.45);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      padding: 40px 36px;
+      max-width: 420px;
+      width: 92%;
+      text-align: center;
+      animation: pop 0.18s ease-out;
+    }
+    @keyframes pop {
+      from { transform: scale(0.96); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .modal-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #16a34a;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .modal p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .modal-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .modal-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
+    .modal-row + .modal-row { border-top: 1px solid #f0f0f0; }
+    .modal-row span:first-child { color: var(--muted); }
+    .modal-row span:last-child  { font-weight: 600; color: var(--text); }
+    .modal-cta {
+      width: 100%;
+      padding: 11px;
+      background: #374151;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Red Hat Display', sans-serif;
+      transition: background 0.12s;
+    }
+    .modal-cta:hover { background: #1f2937; }
+
+    /* ── SCROLLBAR ─────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <a href="#" style="text-decoration:none;">
+      <svg width="158" height="42" viewBox="0 0 390 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer hex left face -->
+        <path d="M35 5L57 18V44L35 57L13 44V18Z" fill="#7BADB8"/>
+        <!-- Outer hex top-right highlight -->
+        <path d="M35 5L57 18L46 24V12Z" fill="#B0D4DC"/>
+        <!-- Outer hex right face shadow -->
+        <path d="M57 18V44L46 38V24Z" fill="#5A93A2"/>
+        <!-- Mid hex -->
+        <path d="M35 14L51 23V41L35 50L19 41V23Z" fill="#4A8694"/>
+        <!-- Core charcoal block -->
+        <path d="M35 22L46 28V38L35 44L24 38V28Z" fill="#2d3748"/>
+        <!-- A letterform white -->
+        <path d="M27 41L32 24L35 31L38 24L43 41H39.5L35 31L30.5 41Z" fill="white"/>
+        <!-- A crossbar (charcoal cutout) -->
+        <rect x="30.5" y="33" width="9" height="2.5" fill="#2d3748"/>
+        <!-- i dot -->
+        <circle cx="35" cy="23" r="2.2" fill="#6DB5C0"/>
+        <!-- Teal stem -->
+        <rect x="33.5" y="41" width="3" height="6" rx="1.5" fill="#6DB5C0"/>
+        <!-- Wordmark -->
+        <text x="70" y="38" font-family="'Red Hat Display', sans-serif" font-size="27" font-weight="700" fill="#2d3748" letter-spacing="-0.5">Reform-A.i</text>
+        <text x="70" y="53" font-family="'Red Hat Display', sans-serif" font-size="8.5" font-weight="400" fill="#9ca3af" letter-spacing="1.8">RENOVATION MADE EASY</text>
+      </svg>
+    </a>
+    <div class="topbar-right">
+      <!-- Globe -->
+      <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
+      </svg>
+      <!-- m² -->
+      <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      </svg>
+      <!-- Bell -->
+      <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <!-- Chat -->
+      <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      <!-- User -->
+      <div class="user-chip">
+        <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+          <path d="M50 8C28 8 12 26 18 46C22 60 14 72 6 78C20 83 36 76 46 64C48 68 49 75 49 82C50 75 51 68 53 64C63 76 79 83 93 78C85 72 77 60 81 46C87 26 71 8 50 8Z" fill="#7B2D2D"/>
+          <ellipse cx="50" cy="46" rx="10" ry="11" fill="#5C1F1F"/>
+        </svg>
+        <span class="user-name">Chuck Leazer</span>
+        <svg class="user-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="body-row">
+
+    <!-- ── SIDEBAR ── -->
+    <nav class="sidebar">
+      <div class="nav-section">
+        <span class="nav-section-label">General</span>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Find clients
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          My Portfolio
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Agreements &amp; Contracts
+        </a>
+      </div>
+
+      <hr class="nav-divider">
+
+      <div class="nav-section">
+        <span class="nav-section-label">Project Management</span>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          My Projects
+        </a>
+        <a class="nav-item active" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Bids
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          Project Tools
+        </a>
+      </div>
+
+      <hr class="nav-divider">
+
+      <div class="nav-section">
+        <span class="nav-section-label">Account</span>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+          Subscription
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Finances &amp; Billing
+        </a>
+      </div>
+
+      <hr class="nav-divider">
+
+      <div class="nav-section">
+        <span class="nav-section-label">Help &amp; Contact</span>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+          Help Center
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          FAQS
+        </a>
+      </div>
+    </nav>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="main">
+
+      <div class="page-header">
+        <h1 class="page-title">Apt 4B, Torre Alianza</h1>
+        <div class="page-actions">
+          <button class="btn btn-cancel" onclick="window.history.back()">Cancel</button>
+          <button class="btn btn-send" id="submit-btn" onclick="handleSubmit()">Submit Interest</button>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- HELPER TEXT BANNER -->
+        <div style="background:#f0fbfb;border:1px solid #a5f3fc;border-radius:8px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span style="font-size:13px;color:#0d9488;font-weight:500;">This is a rough estimate. Final pricing will be confirmed after a walkthrough.</span>
+        </div>
+
+        <!-- BID REQUEST CARD -->
+        <div class="card">
+          <div class="card-label">Bid Request</div>
+          <div class="card-body">
+            <div class="prop-row">
+              <div class="prop-img-wrap">
+                <img
+                  class="prop-img"
+                  src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=400&q=72"
+                  alt="Apt 4B, Torre Alianza — interior"
+                >
+                <span class="area-badge">120 m²</span>
+              </div>
+              <div class="prop-info">
+                <div class="prop-name">Apt 4B, Torre Alianza</div>
+                <div class="prop-type">Residential · Apartment</div>
+                <div class="prop-address">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  <span class="prop-address-text">Cra. 15 #93-47, Apt 4B, Chicó Norte, Bogotá</span>
+                </div>
+                <div class="prop-area-row">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                  </svg>
+                  <span class="prop-area-text">120 m² renovation area</span>
+                </div>
+                <div class="prop-owner">
+                  <svg width="17" height="17" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 8C28 8 12 26 18 46C22 60 14 72 6 78C20 83 36 76 46 64C48 68 49 75 49 82C50 75 51 68 53 64C63 76 79 83 93 78C85 72 77 60 81 46C87 26 71 8 50 8Z" fill="#7B2D2D"/>
+                  </svg>
+                  <span class="prop-owner-name">CJ Leazer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YOUR TRADE CARD -->
+        <div class="card">
+          <div class="card-label">Your trade <span class="req">*</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label class="field-label">What will you be delivering? <span class="req">*</span></label>
+              <div class="trade-grid" id="trade-grid">
+                <button class="tile" data-value="Electrical" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">⚡</span>Electrical</button>
+                <button class="tile" data-value="Plumbing" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🔧</span>Plumbing</button>
+                <button class="tile selected" data-value="Flooring & Tiling" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">◼</span>Flooring &amp; Tiling</button>
+                <button class="tile" data-value="Painting & Finishes" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🖌</span>Painting &amp; Finishes</button>
+                <button class="tile" data-value="Carpentry & Cabinetry" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🪵</span>Carpentry &amp; Cabinetry</button>
+                <button class="tile" data-value="Demolition & Prep" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🪚</span>Demolition &amp; Prep</button>
+                <button class="tile" data-value="HVAC / Climate" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">❄</span>HVAC / Climate</button>
+                <button class="tile" data-value="Windows & Doors" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🪟</span>Windows &amp; Doors</button>
+                <button class="tile" data-value="Full Renovation" onclick="selectTile(this,'trade-grid')"><span class="tile-icon">🏠</span>Full Renovation</button>
+              </div>
+
+              <!-- Custom added service tags -->
+              <div class="custom-tiles" id="custom-tiles"></div>
+
+              <!-- Write-in -->
+              <div class="add-service-row">
+                <input
+                  class="add-service-input"
+                  id="service-input"
+                  type="text"
+                  placeholder="Add your service (e.g. Smart Home Installation)"
+                  maxlength="60"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();addService();}"
+                >
+                <button class="btn-add" onclick="addService()">+ Add service</button>
+              </div>
+
+              <p class="field-hint">Select from the list or write in your own. Homeowners see all bids grouped by trade.</p>
+              <p class="field-error" id="trade-error">Select the trade you will deliver</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTIMATED COST CARD -->
+        <div class="card">
+          <div class="card-label">Estimated cost for your scope <span class="req">*</span></div>
+          <div class="card-body">
+            <div class="field">
+              <div class="two-col">
+                <div>
+                  <div class="sub-label">Minimum estimate</div>
+                  <div class="prefix-wrap">
+                    <span class="prefix">COP$</span>
+                    <input class="prefix-input" type="number" id="est-min" placeholder="Enter amount" min="0"
+                      oninput="validateEst()">
+                  </div>
+                </div>
+                <div>
+                  <div class="sub-label">Maximum estimate</div>
+                  <div class="prefix-wrap">
+                    <span class="prefix">COP$</span>
+                    <input class="prefix-input" type="number" id="est-max" placeholder="Enter amount" min="0"
+                      oninput="validateEst()">
+                  </div>
+                </div>
+              </div>
+              <p class="field-error" id="est-error" style="display:none;">Enter an estimated cost range</p>
+              <p class="field-hint">This should reflect your portion of the project only.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- INCLUDES SELECTOR CARD -->
+        <div class="card">
+          <div class="card-label">What does this estimate include? <span class="req">*</span></div>
+          <div class="card-body">
+            <div class="field">
+              <div class="tier-grid" id="includes-grid" style="grid-template-columns:repeat(3,1fr);">
+                <button class="tile-center" data-value="Labor only"
+                  onclick="selectTile(this,'includes-grid')">Labor only</button>
+                <button class="tile-center" data-value="Labor + materials (estimate)"
+                  onclick="selectTile(this,'includes-grid')">Labor + materials<br><span style="font-size:10px;font-weight:400;">(estimate)</span></button>
+                <button class="tile-center" data-value="Full service (deliver finished result)"
+                  onclick="selectTile(this,'includes-grid')">Full service<br><span style="font-size:10px;font-weight:400;">(finished result)</span></button>
+              </div>
+              <p class="field-error" id="includes-error" style="display:none;">Select what your estimate includes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AVAILABILITY CARD -->
+        <div class="card">
+          <div class="card-label">Availability <span class="req">*</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label class="field-label">When could you start? <span class="req">*</span></label>
+              <div class="tier-grid" id="availability-grid">
+                <button class="tile-center selected" data-value="Within 2 weeks" onclick="selectTile(this,'availability-grid')">Within 2 weeks</button>
+                <button class="tile-center" data-value="2–4 weeks" onclick="selectTile(this,'availability-grid')">2–4 weeks</button>
+                <button class="tile-center" data-value="1–2 months" onclick="selectTile(this,'availability-grid')">1–2 months</button>
+                <button class="tile-center" data-value="Flexible" onclick="selectTile(this,'availability-grid')">Flexible</button>
+              </div>
+              <p class="field-error" id="availability-error">Select your availability</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADDITIONAL NOTE CARD -->
+        <div class="card">
+          <div class="card-label">
+            Additional note
+            <span class="optional-badge">Optional</span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label class="field-label" for="note-textarea">Anything the homeowner should know?</label>
+              <textarea
+                class="textarea"
+                id="note-textarea"
+                maxlength="200"
+                placeholder="e.g. Materials not included · Assumes standard installation · Can start earlier if needed"
+                oninput="document.getElementById('char-count').textContent = this.value.length"
+              ></textarea>
+              <div class="char-count"><span id="char-count">0</span> / 200</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UNLOCK BANNER -->
+        <div class="unlock-banner">
+          <span class="unlock-icon">🔓</span>
+          <div>
+            <div class="unlock-title">Detailed bid comes later</div>
+            <div class="unlock-body">Share a quick estimate now. Full scope, pricing, and milestones are only required after you're selected for a walkthrough.</div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /body-row -->
+</div><!-- /layout -->
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-icon">✓</div>
+    <h2>Interest submitted</h2>
+    <p>Your interest has been submitted. The homeowner will be in touch when they're ready to schedule a walkthrough.</p>
+    <div class="modal-summary" id="modal-summary"></div>
+    <button class="modal-cta" onclick="closeModal()">Back to listings</button>
+  </div>
+</div>
+
+<script>
+  const AREA_M2 = 120;
+
+// Tile selection
+  function selectTile(el, gridId) {
+    const grid = document.getElementById(gridId);
+    grid.querySelectorAll('.selected').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    // Clear any error on that field
+    const errId = gridId.replace('-grid','-error');
+    const errEl = document.getElementById(errId);
+    if (errEl) errEl.classList.remove('show');
+  }
+
+
+
+  // Add custom service
+  function addService() {
+    const inp = document.getElementById('service-input');
+    const val = inp.value.trim();
+    if (!val) return;
+    const container = document.getElementById('custom-tiles');
+    const tile = document.createElement('div');
+    tile.className = 'custom-tile';
+    tile.dataset.value = val;
+    tile.innerHTML =
+      '<span>✏️ ' + val + '</span>' +
+      '<button class="remove-btn" aria-label="Remove ' + val + '" onclick="this.parentElement.remove()">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+          '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
+        '</svg>' +
+      '</button>';
+    container.appendChild(tile);
+    inp.value = '';
+    inp.focus();
+  }
+
+  // Validate est cost
+  function validateEst() {
+    const mn = parseFloat(document.getElementById('est-min').value) || 0;
+    const mx = parseFloat(document.getElementById('est-max').value) || 0;
+    if (mn > 0 || mx > 0) document.getElementById('est-error').style.display = 'none';
+  }
+
+  // Validate & submit
+  function handleSubmit() {
+    let valid = true;
+
+    const trade = document.querySelector('#trade-grid .selected');
+    if (!trade) {
+      document.getElementById('trade-error').classList.add('show');
+      valid = false;
+    }
+
+    const estMin = parseFloat(document.getElementById('est-min').value) || 0;
+    const estMax = parseFloat(document.getElementById('est-max').value) || 0;
+    if (!estMin && !estMax) {
+      document.getElementById('est-error').style.display = 'block';
+      valid = false;
+    }
+
+    const includes = document.querySelector('#includes-grid .selected');
+    if (!includes) {
+      document.getElementById('includes-error').style.display = 'block';
+      valid = false;
+    }
+
+    if (!min && !max) {
+      document.getElementById('rate-error').classList.add('show');
+      valid = false;
+    }
+
+const avail = document.querySelector('#availability-grid .selected');
+    if (!avail) {
+      document.getElementById('availability-error').classList.add('show');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // Build modal summary
+    const tradeVal  = trade.dataset.value;
+    const customs   = [...document.querySelectorAll('#custom-tiles .custom-tile')].map(t => t.dataset.value).join(', ');
+    const tradeStr  = customs ? tradeVal + ', ' + customs : tradeVal;
+    const availVal  = avail.dataset.value;
+
+    const includesVal = document.querySelector('#includes-grid .selected')?.dataset.value || '—';
+    const estMin = document.getElementById('est-min').value ? 'COP$ ' + parseInt(document.getElementById('est-min').value).toLocaleString('es-CO') : '—';
+    const estMax = document.getElementById('est-max').value ? 'COP$ ' + parseInt(document.getElementById('est-max').value).toLocaleString('es-CO') : '—';
+    document.getElementById('modal-summary').innerHTML =
+      '<div class="modal-row"><span>Trade</span><span>' + tradeStr + '</span></div>' +
+      '<div class="modal-row"><span>Estimated cost</span><span>' + estMin + ' – ' + estMax + '</span></div>' +
+      '<div class="modal-row"><span>Includes</span><span>' + includesVal + '</span></div>' +
+      '<div class="modal-row"><span>Availability</span><span>' + availVal + '</span></div>';
+
+    document.getElementById('modal-overlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Init calc
+  calcEstimate();
+</script>
+</body>
+</html>

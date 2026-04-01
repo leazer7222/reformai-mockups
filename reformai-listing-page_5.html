@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reform-A.i | Apt 4B, Torre Alianza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:      #00ADB5;
+      --teal-dark: #009AA2;
+      --border:    #e5e5e5;
+      --muted:     #737373;
+      --text:      #0a0a0a;
+      --bg:        #ffffff;
+      --surface:   #fafafa;
+      --surface-2: #f5f5f5;
+      --danger:    #e40014;
+      --sidebar-w: 248px;
+      --topbar-h:  64px;
+    }
+
+    html, body { font-family: 'Red Hat Display', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+    /* ── TOPBAR ── */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h); background: var(--bg); border-bottom: 0.625px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 18px; z-index: 100; }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .ti { width: 18px; height: 18px; color: #6b7280; opacity: 0.8; cursor: pointer; transition: opacity .15s; }
+    .ti:hover { opacity: 1; }
+    .user-chip { display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background .12s; }
+    .user-chip:hover { background: var(--surface-2); }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--bg); border-right: 1.875px solid var(--border); position: fixed; top: var(--topbar-h); bottom: 0; overflow-y: auto; padding: 16px 0 32px; }
+    .nav-lbl { display: block; font-size: 14px; font-weight: 600; color: var(--muted); padding: 10px 18px 6px; }
+    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; text-decoration: none; border-radius: 6px; margin: 1px 8px; transition: background .1s; }
+    .nav-item:hover { background: var(--surface-2); }
+    .nav-item.active { background: var(--surface-2); font-weight: 700; }
+    .nav-item.disabled { color: #a1a1a1; cursor: default; }
+    .nav-item.disabled:hover { background: transparent; }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; color: #374151; }
+    .nav-item.disabled .nav-icon { color: #d4d4d4; }
+    .nav-chevron { width: 14px; height: 14px; color: #a1a1a1; }
+    .nav-div { border: none; border-top: 1px solid var(--border); margin: 8px 14px; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; padding: 28px 36px 100px; max-width: 1200px; }
+
+    /* ── BACK LINK ── */
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-decoration: none; margin-bottom: 16px; transition: color .12s; }
+    .back-link:hover { color: var(--text); }
+
+    /* ── LISTING TITLE ── */
+    .listing-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .listing-name { font-size: 22px; font-weight: 700; color: var(--text); }
+    .favorite-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; transition: all .12s; background: none; font-family: inherit; }
+    .favorite-btn:hover { border-color: #e40014; color: #e40014; }
+    .listing-address { font-size: 13px; color: var(--muted); margin-bottom: 18px; display: flex; align-items: center; gap: 5px; }
+
+    /* ── PHOTO GRID ── */
+    .photo-grid { display: grid; grid-template-columns: 1fr 280px; gap: 4px; border-radius: 10px; overflow: hidden; height: 320px; margin-bottom: 20px; }
+    .photo-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-stack { display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 4px; }
+    .photo-thumb { position: relative; overflow: hidden; }
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; cursor: pointer; }
+
+    /* ── STATS ROW ── */
+    .stats-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+    .stat-pill { display: flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); }
+    .stat-pill svg { width: 16px; height: 16px; color: var(--muted); }
+
+    /* ── TWO-COL CONTENT ── */
+    .content-grid { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+    .content-left { min-width: 0; }
+
+    /* ── PRICE PANEL ── */
+    .price-panel { border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: sticky; top: calc(var(--topbar-h) + 16px); }
+    .price-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .price-value { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 16px; letter-spacing: -0.5px; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--surface-2); }
+    .price-row-label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .price-row-val { font-size: 13px; font-weight: 600; color: var(--text); }
+    .price-row-na { font-size: 13px; font-weight: 600; color: #a1a1a1; }
+    .btn-interested { width: 100%; margin-top: 16px; padding: 13px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .12s; }
+    .btn-interested:hover { background: var(--teal-dark); }
+
+    /* ── SECTION HEADINGS ── */
+    .section-heading { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; margin-top: 36px; }
+    .section-heading:first-child { margin-top: 0; }
+
+    /* ── HIGHLIGHTS ── */
+    .highlights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .highlight-item { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+    .highlight-icon { width: 34px; height: 34px; background: var(--surface); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .highlight-icon svg { width: 16px; height: 16px; color: var(--muted); }
+    .highlight-label { font-size: 11px; color: var(--muted); }
+    .highlight-val { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+    /* ══════════════════════════════════════════
+       RENOVATION CONCEPTS
+    ══════════════════════════════════════════ */
+    .concepts-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+    .concepts-title { font-size: 20px; font-weight: 700; color: var(--text); }
+    .concepts-count { font-size: 13px; color: var(--muted); }
+    .concepts-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+    .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .concept-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg); transition: border-color .15s; }
+    .concept-card:hover { border-color: #a1a1a1; }
+
+    .concept-img-wrap { position: relative; height: 175px; overflow: hidden; }
+    .concept-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .concept-card:hover .concept-img-wrap img { transform: scale(1.03); }
+
+    .concept-badge-ai { position: absolute; top: 10px; left: 10px; display: flex; align-items: center; gap: 5px; background: rgba(10,10,10,.72); color: white; font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 6px; backdrop-filter: blur(4px); }
+    .concept-badge-ai svg { width: 11px; height: 11px; }
+    .concept-badge-rooms { position: absolute; top: 10px; right: 10px; background: rgba(10,10,10,.72); color: white; font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 6px; backdrop-filter: blur(4px); }
+
+    .concept-body { padding: 14px; }
+    .concept-provider { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+    .concept-provider-logo { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .concept-provider-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .concept-provider-scope { font-size: 11px; color: var(--muted); }
+    .concept-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+    .concept-pricing { margin-bottom: 10px; }
+    .concept-price-main { font-size: 15px; font-weight: 700; color: var(--text); }
+    .concept-price-label { font-size: 11px; color: var(--muted); margin-left: 4px; font-weight: 400; }
+    .concept-price-m2 { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .concept-tier { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; margin-bottom: 12px; }
+    .tier-budget  { background: var(--surface-2); color: #555; border: 1px solid var(--border); }
+    .tier-mid     { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .tier-premium { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .tier-luxury  { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+    .concept-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-concept { padding: 8px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: center; transition: all .12s; }
+    .btn-concept-primary { background: var(--teal); color: white; border: none; }
+    .btn-concept-primary:hover { background: var(--teal-dark); }
+    .btn-concept-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-concept-ghost:hover { background: var(--surface-2); color: var(--text); }
+
+    /* ══════════════════════════════════════════
+       PROFESSIONALS WHO BID — collapsible accordion
+    ══════════════════════════════════════════ */
+    .pros-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+    .pros-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+
+    .trade-group { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+    .trade-group-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; background: var(--bg); user-select: none; transition: background .1s; }
+    .trade-group-header:hover { background: var(--surface); }
+    .trade-group-left { display: flex; align-items: center; gap: 10px; }
+    .trade-group-icon { font-size: 15px; }
+    .trade-group-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .trade-group-count { font-size: 12px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); padding: 2px 9px; border-radius: 20px; }
+    .trade-chevron { width: 16px; height: 16px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+    .trade-group.open .trade-chevron { transform: rotate(180deg); }
+    .trade-group-body { display: none; border-top: 1px solid var(--border); background: var(--surface); }
+    .trade-group.open .trade-group-body { display: block; }
+
+    /* 3-col bid cards inside accordion */
+    .bid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+    .bid-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: var(--bg); transition: border-color .12s; }
+    .bid-card:hover { border-color: #a1a1a1; }
+    .bid-card-top { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+    .bid-card-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .bid-card-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .bid-card-company { font-size: 11px; color: var(--muted); }
+    .bid-card-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+    .bid-card-stats { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .bid-stat-row { display: flex; justify-content: space-between; align-items: center; }
+    .bid-stat-label { font-size: 11px; color: var(--muted); }
+    .bid-stat-val { font-size: 12px; font-weight: 600; color: var(--text); }
+    .bid-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .bid-avail { display: inline-flex; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--surface-2); color: #555; border: 1px solid var(--border); }
+    .bid-portfolio-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); text-align: right; }
+    .btn-portfolio { font-size: 12px; font-weight: 500; color: var(--teal); cursor: pointer; text-decoration: none; background: none; border: none; font-family: inherit; }
+    .btn-portfolio:hover { text-decoration: underline; }
+    .stars { color: #f59e0b; font-size: 11px; }
+    .star-empty { color: var(--border); }
+    .star-count { font-size: 11px; color: var(--muted); margin-left: 3px; }
+
+    /* ── AI SECTION ── */
+    .ai-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0fdf9; border: 1px solid #99f6e4; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: #0d9488; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+    .ai-badge svg { width: 12px; height: 12px; }
+    .ai-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .ai-sub { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 6px; max-width: 520px; }
+    .ai-counter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .ai-spinner { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--border); border-top-color: #0d9488; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #0d9488; }
+    .ai-counter-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .ai-counter-sub { font-size: 12px; color: var(--muted); margin-left: 8px; }
+    .ai-panels { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px; margin-bottom: 16px; }
+    .ai-panel { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .ai-panel-head { padding: 12px 14px 8px; }
+    .ai-panel-lbl { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+    .ai-panel-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .ai-panel-img { height: 200px; overflow: hidden; }
+    .ai-panel-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ai-concept-empty { height: 200px; background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    .ai-concept-icon { width: 44px; height: 44px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .ai-concept-icon svg { width: 22px; height: 22px; color: #0d9488; }
+    .ai-concept-empty-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .ai-concept-empty-sub { font-size: 12px; color: var(--muted); text-align: center; max-width: 180px; line-height: 1.4; }
+    .ai-controls-panel { padding: 16px; }
+    .ai-controls-lbl { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .ai-controls-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .ai-controls-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .ai-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .ai-form-lbl { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; display: block; }
+    .ai-select { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--bg); padding: 0 10px; outline: none; cursor: pointer; }
+    .ai-select:focus { border-color: var(--teal); }
+    .ai-select:disabled { background: var(--surface); color: var(--muted); cursor: not-allowed; }
+    .ai-textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); padding: 10px 12px; outline: none; resize: none; height: 80px; margin-bottom: 14px; transition: border-color .15s; }
+    .ai-textarea:focus { border-color: var(--teal); }
+    .ai-textarea::placeholder { color: #a1a1a1; }
+    .ai-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .ai-img-btn { display: flex; align-items: center; justify-content: center; gap: 7px; height: 42px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; background: var(--bg); font-family: inherit; transition: all .12s; }
+    .ai-img-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .ai-img-btn svg { width: 14px; height: 14px; }
+    .btn-generate { width: 100%; padding: 11px; background: #d4d4d4; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: not-allowed; font-family: inherit; margin-bottom: 8px; }
+    .ai-token-note { font-size: 11px; color: var(--muted); text-align: center; }
+    .ai-photos-section { border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .ai-photos-lbl { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .ai-photos-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .ai-photos-count { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 600; color: #555; }
+    .ai-photos-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ai-photo-thumb { width: 140px; height: 96px; border-radius: 8px; overflow: hidden; position: relative; flex-shrink: 0; border: 2px solid transparent; cursor: pointer; transition: border-color .15s; }
+    .ai-photo-thumb.selected { border-color: var(--teal); }
+    .ai-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ai-photo-badge { position: absolute; bottom: 6px; left: 6px; background: var(--teal); color: white; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+
+    /* ── MAP ── */
+    .map-container { height: 300px; border-radius: 10px; overflow: hidden; background: #e8f0e8; border: 1px solid var(--border); position: relative; display: flex; align-items: center; justify-content: center; }
+    .map-placeholder-text { font-size: 13px; color: var(--muted); }
+    .map-pin { position: absolute; font-size: 28px; }
+    .map-popup { position: absolute; top: 30%; left: 52%; background: white; border-radius: 10px; border: 1px solid var(--border); padding: 14px; width: 240px; }
+    .map-popup-top { display: flex; gap: 10px; margin-bottom: 10px; }
+    .map-popup-img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+    .map-popup-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .map-popup-addr { font-size: 11px; color: var(--muted); line-height: 1.3; }
+    .map-popup-price { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .map-popup-data { border-top: 1px solid var(--border); padding-top: 10px; margin-bottom: 10px; }
+    .map-popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: var(--muted); }
+    .btn-visit { width: 100%; padding: 9px; background: var(--teal); color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-visit:hover { background: var(--teal-dark); }
+
+    /* ── SIMILAR PROPERTIES ── */
+    .similar-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .similar-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color .12s; }
+    .similar-card:hover { border-color: #a1a1a1; }
+    .similar-img { height: 160px; overflow: hidden; }
+    .similar-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .similar-body { padding: 14px; }
+    .similar-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .similar-addr { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+    .similar-price { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 10px; letter-spacing: -0.3px; }
+    .similar-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .similar-stat { background: var(--surface); border-radius: 6px; padding: 8px; text-align: center; }
+    .similar-stat-label { font-size: 11px; color: var(--muted); }
+    .similar-stat-val { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 2px; }
+    .similar-reno { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 6px 0; border-top: 1px solid var(--border); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 99px; }
+
+    /* ══════════════════════════════════════════
+       FULL CONCEPT MODAL
+    ══════════════════════════════════════════ */
+    .fc-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.55);
+      z-index: 500;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 24px;
+      overflow-y: auto;
+    }
+    .fc-overlay.show { display: flex; }
+
+    .fc-modal {
+      background: var(--bg);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 980px;
+      position: relative;
+      animation: fcPop 0.2s ease-out;
+      margin: auto;
+    }
+    @keyframes fcPop {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .fc-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: background .12s;
+    }
+    .fc-close:hover { background: #e5e5e5; }
+    .fc-close svg { width: 14px; height: 14px; color: var(--text); }
+
+    /* Provider header bar */
+    .fc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .fc-provider { display: flex; align-items: center; gap: 12px; }
+    .fc-provider-logo {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .fc-provider-name { font-size: 16px; font-weight: 700; color: var(--text); }
+    .fc-provider-scope { font-size: 13px; color: var(--muted); margin-top: 1px; }
+    .fc-header-price { text-align: right; }
+    .fc-price-main { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+    .fc-price-m2 { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* Two-col body */
+    .fc-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; }
+    .fc-left { padding: 24px; border-right: 1px solid var(--border); min-width: 0; }
+    .fc-right { padding: 20px; }
+
+    /* Section headings inside modal */
+    .fc-section-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 10px; margin-top: 24px; }
+    .fc-section-title:first-child { margin-top: 0; }
+
+    /* Overview */
+    .fc-overview-text { font-size: 13px; color: #555; line-height: 1.7; }
+
+    /* Main image area */
+    .fc-img-layout { display: grid; grid-template-columns: 1fr 130px; gap: 4px; border-radius: 10px; overflow: hidden; height: 300px; margin-top: 14px; }
+    .fc-img-main { position: relative; overflow: hidden; }
+    .fc-img-main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .3s; }
+    .fc-ai-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(10,10,10,.72); color: white;
+      font-size: 11px; font-weight: 600; padding: 4px 9px;
+      border-radius: 6px; backdrop-filter: blur(4px);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .fc-ai-badge svg { width: 11px; height: 11px; }
+    .fc-view-before {
+      position: absolute; bottom: 10px; left: 10px;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(10,10,10,.72); color: white;
+      font-size: 11px; font-weight: 600; padding: 5px 10px;
+      border-radius: 20px; cursor: pointer; user-select: none;
+      backdrop-filter: blur(4px); transition: background .12s;
+    }
+    .fc-view-before:hover { background: rgba(10,10,10,.9); }
+    .fc-toggle { width: 28px; height: 16px; background: #555; border-radius: 20px; position: relative; transition: background .2s; flex-shrink: 0; }
+    .fc-toggle.on { background: var(--teal); }
+    .fc-toggle::after { content: ''; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: transform .2s; }
+    .fc-toggle.on::after { transform: translateX(12px); }
+
+    .fc-img-thumbs { display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 4px; }
+    .fc-thumb {
+      overflow: hidden; cursor: pointer; position: relative;
+      border: 2px solid transparent; transition: border-color .15s;
+    }
+    .fc-thumb.active { border-color: var(--teal); }
+    .fc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fc-thumb-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,.6); color: white;
+      font-size: 9px; font-weight: 600; padding: 3px 6px;
+    }
+
+    /* Room tabs */
+    .fc-room-tabs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .fc-tab {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+      cursor: pointer; transition: all .12s; font-family: inherit;
+    }
+    .fc-tab.active { border-color: var(--teal); background: #f0fbfb; color: var(--teal); font-weight: 600; }
+
+    /* Commercial breakdown table */
+    .fc-breakdown { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .fc-breakdown td { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .fc-breakdown tr:last-child td { border-bottom: none; }
+    .fc-breakdown td:first-child { color: var(--muted); width: 50%; }
+    .fc-breakdown td:last-child { font-weight: 600; color: var(--text); text-align: right; }
+    .fc-disclaimer { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+    /* Materials grid */
+    .fc-materials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+    .fc-material-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .fc-material-img { height: 80px; overflow: hidden; }
+    .fc-material-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fc-material-body { padding: 8px 10px; }
+    .fc-material-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .fc-material-cat { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Right rail */
+    .fc-right-price { margin-bottom: 14px; }
+    .fc-right-price-main { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .fc-right-price-m2 { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .fc-btn-primary {
+      width: 100%; padding: 11px; background: var(--teal); color: white;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit; margin-bottom: 8px;
+      transition: background .12s; display: flex; align-items: center;
+      justify-content: center; gap: 7px;
+    }
+    .fc-btn-primary:hover { background: var(--teal-dark); }
+    .fc-btn-secondary {
+      width: 100%; padding: 10px; background: var(--bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
+      font-weight: 500; cursor: pointer; font-family: inherit; margin-bottom: 16px;
+      transition: background .12s;
+    }
+    .fc-btn-secondary:hover { background: var(--surface-2); }
+
+    /* Provider sidebar card */
+    .fc-provider-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .fc-provider-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .fc-provider-card-logo {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .fc-provider-card-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .fc-provider-card-scope { font-size: 11px; color: var(--muted); }
+    .fc-stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-top: 1px solid var(--border); }
+    .fc-stat-row span:first-child { color: var(--muted); }
+    .fc-stat-row span:last-child { font-weight: 600; color: var(--text); }
+    .fc-about-title { font-size: 12px; font-weight: 600; color: var(--text); margin: 14px 0 8px; }
+    .fc-sample-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+    .fc-sample-img { border-radius: 6px; overflow: hidden; height: 64px; }
+    .fc-sample-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fc-view-all { font-size: 11px; color: var(--teal); font-weight: 600; cursor: pointer; text-align: right; display: block; margin-top: -4px; margin-bottom: 12px; }
+    .fc-btn-consult {
+      width: 100%; padding: 11px; background: var(--teal); color: white;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: background .12s;
+    }
+    .fc-btn-consult:hover { background: var(--teal-dark); }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <a href="#" style="text-decoration:none; display:flex; align-items:center;">
+    <svg width="158" height="42" viewBox="0 0 390 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35 5L57 18V44L35 57L13 44V18Z" fill="#7BADB8"/>
+      <path d="M35 5L57 18L46 24V12Z" fill="#B0D4DC"/>
+      <path d="M57 18V44L46 38V24Z" fill="#5A93A2"/>
+      <path d="M35 14L51 23V41L35 50L19 41V23Z" fill="#4A8694"/>
+      <path d="M35 22L46 28V38L35 44L24 38V28Z" fill="#2d3748"/>
+      <path d="M27 41L32 24L35 31L38 24L43 41H39.5L35 31L30.5 41Z" fill="white"/>
+      <rect x="30.5" y="33" width="9" height="2.5" fill="#2d3748"/>
+      <circle cx="35" cy="23" r="2.2" fill="#6DB5C0"/>
+      <rect x="33.5" y="41" width="3" height="6" rx="1.5" fill="#6DB5C0"/>
+      <text x="70" y="38" font-family="'Red Hat Display',sans-serif" font-size="27" font-weight="700" fill="#2d3748" letter-spacing="-0.5">Reform-A.i</text>
+      <text x="70" y="53" font-family="'Red Hat Display',sans-serif" font-size="8.5" font-weight="400" fill="#9ca3af" letter-spacing="1.8">RENOVATION MADE EASY</text>
+    </svg>
+  </a>
+  <div class="topbar-right">
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <div class="user-chip">
+      <svg width="22" height="22" viewBox="0 0 100 100" fill="none"><path d="M50 8C28 8 12 26 18 46C22 60 14 72 6 78C20 83 36 76 46 64C48 68 49 75 49 82C50 75 51 68 53 64C63 76 79 83 93 78C85 72 77 60 81 46C87 26 71 8 50 8Z" fill="#7B2D2D"/></svg>
+      <span class="user-name">CJ Leazer</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <span class="nav-lbl">General</span>
+    <a class="nav-item active" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Find a Home</div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>My Properties</div></a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Reform-Ai</div></a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>My AI Visuals</div></a>
+    <a class="nav-item disabled" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Inspiration Hub</div></a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Find a Pro</div></a>
+    <a class="nav-item" href="#">
+      <div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Partnered Projects</div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <hr class="nav-div">
+    <span class="nav-lbl">Profile Management</span>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>Subscription</div></a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finances &amp; Billing</div></a>
+    <hr class="nav-div">
+    <span class="nav-lbl">Project Management</span>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My Projects</div></a>
+    <hr class="nav-div">
+    <span class="nav-lbl">Help &amp; Contact</span>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help Center</div></a>
+    <a class="nav-item" href="#"><div class="nav-left"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>FAQs</div></a>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main">
+
+    <!-- Back link -->
+    <a href="#" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to listings
+    </a>
+
+    <!-- Title + favorite -->
+    <div class="listing-title">
+      <h1 class="listing-name">Apt 4B, Torre Alianza</h1>
+      <button class="favorite-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        Favorite
+      </button>
+    </div>
+
+    <!-- Address -->
+    <div class="listing-address">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Calle 85 #15-23, Bogotá, Colombia
+    </div>
+
+    <!-- Photo grid -->
+    <div class="photo-grid">
+      <div class="photo-main">
+        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900" alt="Main property photo">
+      </div>
+      <div class="photo-stack">
+        <div class="photo-thumb"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=400" alt="Kitchen"></div>
+        <div class="photo-thumb"><img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=400" alt="Bedroom"></div>
+        <div class="photo-thumb">
+          <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&q=80&w=400" alt="More photos">
+          <div class="photo-overlay">See all 6 photos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4v16M22 4v16M2 8h20M2 16h20"/></svg>3 Bedrooms</div>
+      <div class="stat-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12h20M2 6a5 5 0 015-5v11H2V6z"/></svg>2 Bathrooms</div>
+      <div class="stat-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18"/></svg>120 m²</div>
+      <div class="stat-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>1 Parking</div>
+    </div>
+
+    <!-- Two-col layout -->
+    <div class="content-grid">
+      <div class="content-left">
+
+        <!-- Overview -->
+        <div class="section-heading">Overview</div>
+        <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:28px;">Full apartment renovation opportunity in Torre Alianza. High ceilings, open plan living across 120 m². Currently vacant and ready for full works. Strong ARV potential in this prime sector of Bogotá's Chicó Norte neighbourhood.</p>
+
+        <!-- Highlights -->
+        <div class="section-heading" style="margin-top:0;">Highlights</div>
+        <div class="highlights-grid" style="margin-bottom:0;">
+          <div class="highlight-item"><div class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div><div><div class="highlight-label">Property Type</div><div class="highlight-val">Residential</div></div></div>
+          <div class="highlight-item"><div class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><div class="highlight-label">Year Built</div><div class="highlight-val">2008</div></div></div>
+          <div class="highlight-item"><div class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><div><div class="highlight-label">Listing Type</div><div class="highlight-val">Para Venta</div></div></div>
+          <div class="highlight-item"><div class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div><div><div class="highlight-label">Condition</div><div class="highlight-val">Needs work</div></div></div>
+        </div>
+
+        <!-- ════ RENOVATION CONCEPTS ════ -->
+        <div style="margin-top:36px;">
+          <div class="concepts-header">
+            <div class="concepts-title">Reimagined by Professionals</div>
+            <span class="concepts-count">6 concepts</span>
+          </div>
+          <div class="concepts-sub">Service providers have submitted renovation concepts for this property. See what it could look like after transformation.</div>
+
+          <div class="concepts-grid">
+
+            <!-- Concept 1 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=600" alt="Full renovation concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+                <div class="concept-badge-rooms">+2 Rooms</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#7c3aed;">U</div>
+                  <div><div class="concept-provider-name">Urban Build Group</div><div class="concept-provider-scope">Full Renovation</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 132,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 1,100,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-premium">Premium</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('Urban Build Group','Full Renovation','premium','COP$ 132,000,000','COP$ 1,100,000','#7c3aed','U','This premium full renovation modernizes layout, lighting, and finishes to elevate the space into a high-performance executive environment. Open-plan living is reconfigured with smart zoning across all 120 m².','https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept 2 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=600" alt="Kitchen renovation concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#0891b2;">E</div>
+                  <div><div class="concept-provider-name">Elite Office Refurb</div><div class="concept-provider-scope">Kitchen Renovation</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 78,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 650,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-mid">Mid-range</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('Elite Office Refurb','Kitchen Renovation','mid','COP$ 78,000,000','COP$ 650,000','#0891b2','E','A focused kitchen renovation that transforms the core cooking and entertaining space with contemporary cabinetry, integrated appliances, and premium stone surfaces throughout.','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept 3 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=600" alt="Full renovation concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+                <div class="concept-badge-rooms">+1 Room</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#059669;">P</div>
+                  <div><div class="concept-provider-name">Precision Interiors</div><div class="concept-provider-scope">Full Renovation</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 105,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 875,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-premium">Premium</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('Precision Interiors','Full Renovation','premium','COP$ 105,000,000','COP$ 875,000','#059669','P','A refined full renovation with Scandinavian-influenced finishes. Maximises natural light with open floor transitions, warm wood tones, and considered storage solutions throughout.','https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept 4 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&q=80&w=600" alt="Cosmetic renovation concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#b45309;">M</div>
+                  <div><div class="concept-provider-name">ModernSpaces CO</div><div class="concept-provider-scope">Cosmetic Renovation</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 48,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 400,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-budget">Budget</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('ModernSpaces CO','Cosmetic Renovation','budget','COP$ 48,000,000','COP$ 400,000','#b45309','M','A high-impact cosmetic renovation delivering fresh finishes, updated fixtures, and modern paint palette — maximum visual transformation at minimum cost.','https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept 5 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=600" alt="Flooring upgrade concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#0891b2;">L</div>
+                  <div><div class="concept-provider-name">Luxe Floors CO</div><div class="concept-provider-scope">Flooring Upgrade</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 168,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 1,400,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-luxury">Luxury</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('Luxe Floors CO','Flooring Upgrade','luxury','COP$ 168,000,000','COP$ 1,400,000','#0891b2','L','An ultra-premium flooring transformation using imported Calacatta marble, wide-plank engineered oak, and heated subfloor systems. Every surface underfoot becomes a statement.','https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept 6 -->
+            <div class="concept-card">
+              <div class="concept-img-wrap">
+                <img src="https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&q=80&w=600" alt="Structural upgrade concept">
+                <div class="concept-badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI Transformation</div>
+                <div class="concept-badge-rooms">+3 Rooms</div>
+              </div>
+              <div class="concept-body">
+                <div class="concept-provider">
+                  <div class="concept-provider-logo" style="background:#374151;">S</div>
+                  <div><div class="concept-provider-name">StrongBuild SAS</div><div class="concept-provider-scope">Structural Upgrade</div></div>
+                </div>
+                <div class="concept-divider"></div>
+                <div class="concept-pricing">
+                  <span class="concept-price-main">COP$ 156,000,000</span><span class="concept-price-label">Max est.</span>
+                  <div class="concept-price-m2">COP$ 1,300,000 / m²</div>
+                </div>
+                <div><span class="concept-tier tier-premium">Premium</span></div>
+                <div class="concept-actions">
+                  <button class="btn-concept btn-concept-primary" onclick="openConcept('StrongBuild SAS','Structural Upgrade','premium','COP$ 156,000,000','COP$ 1,300,000','#374151','S','A structural-first renovation that opens the floorplan by removing non-load-bearing walls, reinforcing load points, and adding +3 rooms through smart reconfiguration of existing space.','https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&q=80&w=900','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=900')">View Full Concept</button>
+                  <button class="btn-concept btn-concept-ghost">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ PROFESSIONALS WHO BID — public view ════ -->
+        <div style="margin-top:36px;">
+          <div class="pros-header">
+            <div class="concepts-title">Professionals interested</div>
+            <span class="concepts-count">6 bids across 3 trades</span>
+          </div>
+          <div class="pros-sub">Contractors have submitted preliminary bids for this property. Rates are per m² — final pricing confirmed after site walkthrough.</div>
+
+          <!-- Flooring & Tiling — open by default -->
+          <div class="trade-group open">
+            <div class="trade-group-header" onclick="toggleGroup(this.parentElement)">
+              <div class="trade-group-left">
+                <span class="trade-group-icon">◼</span>
+                <span class="trade-group-name">Flooring &amp; Tiling</span>
+                <span class="trade-group-count">3 bids</span>
+              </div>
+              <svg class="trade-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="trade-group-body">
+              <div class="bid-cards">
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#7c3aed;">C</div><div><div class="bid-card-name">Chuck Leazer</div><div class="bid-card-company">Chuck's General Contracting</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 700k – 1M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 84M – 120M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★★★</span><span class="star-count">5.0</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-mid" style="margin-bottom:0;">Mid-range</span><span class="bid-avail">Within 2 weeks</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#0891b2;">T</div><div><div class="bid-card-name">TileFit Pro</div><div class="bid-card-company">TileFit Solutions SAS</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 500k – 650k</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 60M – 78M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★★<span class="star-empty">★</span></span><span class="star-count">4.1</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-budget" style="margin-bottom:0;">Budget</span><span class="bid-avail">2–4 weeks</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#b45309;">L</div><div><div class="bid-card-name">Luxe Floors CO</div><div class="bid-card-company">Luxe Interiors Group</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 1.1M – 1.4M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 132M – 168M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★★★</span><span class="star-count">4.8</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-premium" style="margin-bottom:0;">Premium</span><span class="bid-avail">1–2 months</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plumbing — collapsed -->
+          <div class="trade-group">
+            <div class="trade-group-header" onclick="toggleGroup(this.parentElement)">
+              <div class="trade-group-left">
+                <span class="trade-group-icon">🔧</span>
+                <span class="trade-group-name">Plumbing</span>
+                <span class="trade-group-count">2 bids</span>
+              </div>
+              <svg class="trade-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="trade-group-body">
+              <div class="bid-cards">
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#059669;">A</div><div><div class="bid-card-name">AquaFix Solutions</div><div class="bid-card-company">AquaFix SAS</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 400k – 500k</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 48M – 60M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★★<span class="star-empty">★</span></span><span class="star-count">4.3</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-mid" style="margin-bottom:0;">Mid-range</span><span class="bid-avail">Within 2 weeks</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#475569;">P</div><div><div class="bid-card-name">PipePro</div><div class="bid-card-company">PipePro Colombia</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 280k – 380k</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 33.6M – 45.6M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★<span class="star-empty">★★</span></span><span class="star-count">3.8</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-budget" style="margin-bottom:0;">Budget</span><span class="bid-avail">Flexible</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Electrical — collapsed -->
+          <div class="trade-group">
+            <div class="trade-group-header" onclick="toggleGroup(this.parentElement)">
+              <div class="trade-group-left">
+                <span class="trade-group-icon">⚡</span>
+                <span class="trade-group-name">Electrical</span>
+                <span class="trade-group-count">1 bid</span>
+              </div>
+              <svg class="trade-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="trade-group-body">
+              <div class="bid-cards">
+                <div class="bid-card">
+                  <div class="bid-card-top"><div class="bid-card-avatar" style="background:#1d4ed8;">E</div><div><div class="bid-card-name">EliteElec Co.</div><div class="bid-card-company">EliteElec Colombia SAS</div></div></div>
+                  <div class="bid-card-divider"></div>
+                  <div class="bid-card-stats">
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rate / m²</span><span class="bid-stat-val">COP$ 250k – 320k</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Est. total (120 m²)</span><span class="bid-stat-val">COP$ 30M – 38.4M</span></div>
+                    <div class="bid-stat-row"><span class="bid-stat-label">Rating</span><span class="bid-stat-val"><span class="stars">★★★★★</span><span class="star-count">4.7</span></span></div>
+                  </div>
+                  <div class="bid-card-footer"><span class="concept-tier tier-mid" style="margin-bottom:0;">Mid-range</span><span class="bid-avail">2–4 weeks</span></div>
+                  <div class="bid-portfolio-row"><a class="btn-portfolio" href="#">View Portfolio →</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ AI RENOVATION PREVIEW ════ -->
+        <div style="margin-top:36px;">
+          <div class="ai-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>AI-Powered Renovation Preview</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="ai-title">Generate a redesign from this listing</div>
+              <div class="ai-sub">Use one of the property's photos as your before image, then guide the AI with room type, style, prompts, and optional references.</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);white-space:nowrap;margin-left:16px;padding-top:4px;">1 token per render</div>
+          </div>
+          <div class="ai-counter-row">
+            <div class="ai-spinner">13</div>
+            <div><span class="ai-counter-label">AI Visualizations</span><span class="ai-counter-sub">13 / 46 used · 33 left</span></div>
+          </div>
+          <div class="ai-panels">
+            <div class="ai-panel">
+              <div class="ai-panel-head"><div class="ai-panel-lbl">Original</div><div class="ai-panel-title">Selected property photo</div></div>
+              <div class="ai-panel-img"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=500" alt="Original"></div>
+            </div>
+            <div class="ai-panel">
+              <div class="ai-panel-head"><div class="ai-panel-lbl">AI Concept</div><div class="ai-panel-title">Generate your first concept</div></div>
+              <div class="ai-concept-empty">
+                <div class="ai-concept-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                <div class="ai-concept-empty-title">Generate your first concept</div>
+                <div class="ai-concept-empty-sub">Select a property photo, room type, and style to see the redesign here.</div>
+              </div>
+            </div>
+            <div class="ai-panel">
+              <div class="ai-controls-panel">
+                <div class="ai-controls-lbl">Design Controls</div>
+                <div class="ai-controls-title">Configure Your Design</div>
+                <div class="ai-controls-sub">Choose the room, pick a style, and add optional references for a more directed result.</div>
+                <div class="ai-form-row">
+                  <div><label class="ai-form-lbl">Space Type</label><select class="ai-select" onchange="document.getElementById('style-sel').disabled=!this.value"><option value="">Select room type</option><option>Living Room</option><option>Kitchen</option><option>Bedroom</option><option>Bathroom</option></select></div>
+                  <div><label class="ai-form-lbl">Design Style</label><select class="ai-select" id="style-sel" disabled><option>Select room type first</option><option>Modern</option><option>Scandinavian</option><option>Industrial</option><option>Minimalist</option></select></div>
+                </div>
+                <label class="ai-form-lbl">Prompt <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);">(Optional)</span></label>
+                <textarea class="ai-textarea" placeholder="Describe specific changes or elements you want..."></textarea>
+                <div class="ai-img-row">
+                  <div><label class="ai-form-lbl">Moodboard Image</label><button class="ai-img-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Add moodboard</button></div>
+                  <div><label class="ai-form-lbl">Furniture Image</label><button class="ai-img-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Add furniture</button></div>
+                </div>
+                <button class="btn-generate">Generate Design</button>
+                <div class="ai-token-note">Each render uses one token from your AI visualization quota.</div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-photos-section">
+            <div class="ai-photos-lbl">Select a Listing Photo</div>
+            <div class="ai-photos-sub"><span>Use any property photo below as the before image for this render.</span><span class="ai-photos-count">2</span></div>
+            <div class="ai-photos-grid">
+              <div class="ai-photo-thumb selected" onclick="selectPhoto(this)"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300" alt=""><div class="ai-photo-badge">Selected</div></div>
+              <div class="ai-photo-thumb" onclick="selectPhoto(this)"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=300" alt=""></div>
+              <div class="ai-photo-thumb" onclick="selectPhoto(this)"><img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=300" alt=""></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ MAP ════ -->
+        <div style="margin-top:36px;">
+          <div class="section-heading">Property Location</div>
+          <div class="map-container">
+            <div class="map-placeholder-text">📍 Chicó Norte, Bogotá, Colombia</div>
+            <div class="map-pin" style="top:42%;left:46%;">📍</div>
+            <div class="map-popup">
+              <div class="map-popup-top">
+                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=100" class="map-popup-img" alt="">
+                <div><div class="map-popup-name">Apt 4B, Torre Alianza</div><div class="map-popup-addr">Calle 85 #15-23, Bogotá</div></div>
+              </div>
+              <div class="map-popup-price">COP$250,000,000</div>
+              <div class="map-popup-data">
+                <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;">Location Data</div>
+                <div class="map-popup-grid"><span>City: Bogotá</span><span>State: Cundinamarca</span><span>ZIP: 110111</span><span>4.711, -74.072</span></div>
+              </div>
+              <button class="btn-visit">Visit Property</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ ADDITIONAL INFO ════ -->
+        <div style="margin-top:36px;">
+          <div class="section-heading">Additional Information</div>
+          <p style="font-size:13px;color:var(--muted);">No crime rate information available for this area.</p>
+        </div>
+
+        <!-- ════ SIMILAR PROPERTIES ════ -->
+        <div style="margin-top:36px;">
+          <div class="section-heading">Similar Properties</div>
+          <div class="similar-grid">
+            <div class="similar-card">
+              <div class="similar-img"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=600" alt="Similar property"></div>
+              <div class="similar-body">
+                <div class="similar-name">Multiple Picture Test</div>
+                <div class="similar-addr"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>21102 West Farwood Terrace, Harris County, TX</div>
+                <div class="similar-price">COP$ 20,000,000</div>
+                <div class="similar-stats">
+                  <div class="similar-stat"><div class="similar-stat-label">Bedrooms</div><div class="similar-stat-val">5</div></div>
+                  <div class="similar-stat"><div class="similar-stat-label">Bathrooms</div><div class="similar-stat-val">5</div></div>
+                  <div class="similar-stat"><div class="similar-stat-label">Area</div><div class="similar-stat-val">200 m²</div></div>
+                </div>
+                <div class="similar-reno"><span>Estimated Renovation:</span><span style="color:#a1a1a1;">Coming soon</span></div>
+              </div>
+            </div>
+            <div class="similar-card">
+              <div class="similar-img"><img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&q=80&w=600" alt="Similar property"></div>
+              <div class="similar-body">
+                <div class="similar-name">Local 101, Torre Sur</div>
+                <div class="similar-addr"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Avenida Carrera 15, Bogotá</div>
+                <div class="similar-price">COP$ 6,000,000,000</div>
+                <div class="similar-stats">
+                  <div class="similar-stat"><div class="similar-stat-label">Bedrooms</div><div class="similar-stat-val">0</div></div>
+                  <div class="similar-stat"><div class="similar-stat-label">Bathrooms</div><div class="similar-stat-val">2</div></div>
+                  <div class="similar-stat"><div class="similar-stat-label">Area</div><div class="similar-stat-val">245 m²</div></div>
+                </div>
+                <div class="similar-reno"><span>Estimated Renovation:</span><span style="color:#a1a1a1;">Coming soon</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content-left -->
+
+      <!-- ── PRICE PANEL (sticky right rail) ── -->
+      <div>
+        <div class="price-panel">
+          <div class="price-label">Price</div>
+          <div class="price-value">COP$250,000,000</div>
+          <div class="price-row">
+            <span class="price-row-label">Estimated Renovation Cost <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></span>
+            <span class="price-row-na">N/A</span>
+          </div>
+          <div class="price-row">
+            <span class="price-row-label">After-Repair Value (ARV) <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></span>
+            <span class="price-row-na" style="color:#3b82f6;">N/A</span>
+          </div>
+          <button class="btn-interested">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            I'm interested
+          </button>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+            <p style="font-size:12px;color:var(--muted);line-height:1.5;">Have questions about this property? Let's connect and understand better.</p>
+            <button style="width:100%;margin-top:10px;padding:10px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .12s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Schedule an appointment
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-grid -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+
+<!-- ══════════════════════════════════════════
+     FULL CONCEPT MODAL
+══════════════════════════════════════════ -->
+<div class="fc-overlay" id="fc-overlay" onclick="fcOverlayClick(event)">
+  <div class="fc-modal" id="fc-modal">
+
+    <!-- Close -->
+    <button class="fc-close" onclick="closeConcept()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <!-- Provider header -->
+    <div class="fc-header">
+      <div class="fc-provider">
+        <div class="fc-provider-logo" id="fc-logo">U</div>
+        <div>
+          <div class="fc-provider-name" id="fc-name">Urban Build Group</div>
+          <div class="fc-provider-scope" id="fc-scope">Full Renovation</div>
+          <div style="margin-top:6px;"><span class="concept-tier" id="fc-tier-badge">Premium</span></div>
+        </div>
+      </div>
+      <div class="fc-header-price">
+        <div class="fc-price-main" id="fc-price-main">COP$ 132,000,000</div>
+        <div class="fc-price-m2" id="fc-price-m2">COP$ 1,100,000 / m²</div>
+      </div>
+    </div>
+
+    <!-- Two-col body -->
+    <div class="fc-body">
+
+      <!-- LEFT -->
+      <div class="fc-left">
+
+        <!-- Concept Overview -->
+        <div class="fc-section-title">Concept Overview</div>
+        <p class="fc-overview-text" id="fc-desc">Description here.</p>
+
+        <!-- Main image + thumbs -->
+        <div class="fc-img-layout" style="margin-top:16px;">
+          <div class="fc-img-main">
+            <img id="fc-main-img" src="" alt="AI Transformation">
+            <div class="fc-ai-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              AI Transformation
+            </div>
+            <div class="fc-view-before" onclick="toggleBefore()" id="fc-before-toggle">
+              <div class="fc-toggle" id="fc-toggle"></div>
+              View Before
+            </div>
+          </div>
+          <div class="fc-img-thumbs">
+            <div class="fc-thumb active" onclick="switchRoom(this,'living','https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=900')">
+              <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=300" alt="">
+              <div class="fc-thumb-label">Living Area</div>
+            </div>
+            <div class="fc-thumb" onclick="switchRoom(this,'kitchen','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=900')">
+              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=300" alt="">
+              <div class="fc-thumb-label">Kitchen</div>
+            </div>
+            <div class="fc-thumb" onclick="switchRoom(this,'bedroom','https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=900')">
+              <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=300" alt="">
+              <div class="fc-thumb-label">Bedroom</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Room tabs -->
+        <div class="fc-room-tabs">
+          <button class="fc-tab active" onclick="switchRoomTab(this,'living','https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=900')">Living Area</button>
+          <button class="fc-tab" onclick="switchRoomTab(this,'kitchen','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=900')">Kitchen</button>
+          <button class="fc-tab" onclick="switchRoomTab(this,'bedroom','https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=900')">Bedroom</button>
+        </div>
+
+        <!-- Commercial Breakdown -->
+        <div class="fc-section-title">Commercial Breakdown</div>
+        <table class="fc-breakdown">
+          <tr><td>Scope Category</td><td id="fc-bd-scope">Full Renovation</td></tr>
+          <tr><td>Budget Tier</td><td id="fc-bd-tier"><span class="concept-tier tier-premium">Premium</span></td></tr>
+          <tr><td>Max Price per m²</td><td id="fc-bd-m2">COP$ 1,100,000 / m²</td></tr>
+          <tr><td>Max Estimated Renovation</td><td id="fc-bd-total" style="font-size:15px;">COP$ 132,000,000</td></tr>
+        </table>
+        <p class="fc-disclaimer">Final pricing subject to site inspection and scope confirmation.</p>
+
+        <!-- Included Materials & Products -->
+        <div class="fc-section-title">Included Materials &amp; Products</div>
+        <div class="fc-materials-grid">
+          <div class="fc-material-card">
+            <div class="fc-material-img"><img src="https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&q=80&w=300" alt="Flooring"></div>
+            <div class="fc-material-body"><div class="fc-material-name">Calacatta Gold Porcelain</div><div class="fc-material-cat">Flooring</div></div>
+          </div>
+          <div class="fc-material-card">
+            <div class="fc-material-img"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=300" alt="Wall Paneling"></div>
+            <div class="fc-material-body"><div class="fc-material-name">Modern Wood Veneer Paneling</div><div class="fc-material-cat">Wall Paneling</div></div>
+          </div>
+          <div class="fc-material-card">
+            <div class="fc-material-img"><img src="https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&q=80&w=300" alt="Lighting"></div>
+            <div class="fc-material-body"><div class="fc-material-name">Minimalist Linear Pendant</div><div class="fc-material-cat">Lighting</div></div>
+          </div>
+        </div>
+
+      </div><!-- /fc-left -->
+
+      <!-- RIGHT -->
+      <div class="fc-right">
+        <div class="fc-right-price">
+          <div class="fc-right-price-main" id="fc-right-price">COP$ 132,000,000</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Max Estimated Renovation</div>
+          <div class="fc-right-price-m2" id="fc-right-m2">COP$ 1,100,000 / m²</div>
+        </div>
+
+        <button class="fc-btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          View Profile
+        </button>
+        <button class="fc-btn-secondary">Contact Provider</button>
+
+        <!-- Provider card -->
+        <div class="fc-provider-card">
+          <div class="fc-provider-card-top">
+            <div class="fc-provider-card-logo" id="fc-card-logo">U</div>
+            <div>
+              <div class="fc-provider-card-name" id="fc-card-name">Urban Build Group</div>
+              <div class="fc-provider-card-scope" id="fc-card-scope">Full Renovation</div>
+            </div>
+          </div>
+          <div class="fc-stat-row"><span>Years in Business</span><span>12+</span></div>
+          <div class="fc-stat-row"><span>Completed Projects</span><span>180+</span></div>
+          <div class="fc-stat-row"><span>Rating</span><span>★★★★★ 4.9</span></div>
+
+          <button class="fc-btn-primary" style="margin-top:12px;margin-bottom:0;">View Full Profile</button>
+
+          <div class="fc-about-title">About <span id="fc-about-name">Urban Build Group</span></div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;">Award-winning renovation studio specialising in full-scope residential and commercial transformations across Bogotá.</div>
+
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+            Sample Projects <span class="fc-view-all" style="margin-bottom:0;">View All →</span>
+          </div>
+          <div class="fc-sample-grid">
+            <div class="fc-sample-img"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=200" alt=""></div>
+            <div class="fc-sample-img"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=200" alt=""></div>
+            <div class="fc-sample-img"><img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=200" alt=""></div>
+            <div class="fc-sample-img"><img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=200" alt=""></div>
+          </div>
+
+          <button class="fc-btn-consult">Request Consultation</button>
+        </div>
+
+      </div><!-- /fc-right -->
+    </div><!-- /fc-body -->
+  </div><!-- /fc-modal -->
+</div><!-- /fc-overlay -->
+
+<script>
+  // ── Existing scripts ──
+  function toggleGroup(group) { group.classList.toggle('open'); }
+
+  function selectPhoto(el) {
+    document.querySelectorAll('.ai-photo-thumb').forEach(t => {
+      t.classList.remove('selected');
+      const badge = t.querySelector('.ai-photo-badge');
+      if (badge) badge.remove();
+    });
+    el.classList.add('selected');
+    const badge = document.createElement('div');
+    badge.className = 'ai-photo-badge';
+    badge.textContent = 'Selected';
+    el.appendChild(badge);
+  }
+
+  document.querySelector('.ai-select').addEventListener('change', function() {
+    const styleSel = document.getElementById('style-sel');
+    if (this.value) {
+      styleSel.disabled = false;
+      styleSel.innerHTML = '<option value="">Select style</option><option>Modern</option><option>Scandinavian</option><option>Industrial</option><option>Minimalist</option><option>Mediterranean</option>';
+    } else {
+      styleSel.disabled = true;
+      styleSel.innerHTML = '<option>Select room type first</option>';
+    }
+  });
+
+  // ── Full Concept Modal ──
+  let fcBeforeImg = '';
+  let fcAfterImg  = '';
+  let fcShowingBefore = false;
+
+  const tierClasses = {
+    budget:  'tier-budget',
+    mid:     'tier-mid',
+    premium: 'tier-premium',
+    luxury:  'tier-luxury',
+  };
+  const tierLabels = { budget: 'Budget', mid: 'Mid-range', premium: 'Premium', luxury: 'Luxury' };
+
+  function openConcept(provider, scope, tier, price, m2, color, initial, desc, afterImg, beforeImg) {
+    fcAfterImg  = afterImg;
+    fcBeforeImg = beforeImg;
+    fcShowingBefore = false;
+
+    // Header
+    document.getElementById('fc-logo').textContent = initial;
+    document.getElementById('fc-logo').style.background = color;
+    document.getElementById('fc-name').textContent = provider;
+    document.getElementById('fc-scope').textContent = scope;
+    const tierBadge = document.getElementById('fc-tier-badge');
+    tierBadge.textContent = tierLabels[tier] || tier;
+    tierBadge.className = 'concept-tier ' + (tierClasses[tier] || 'tier-mid');
+
+    // Price header
+    document.getElementById('fc-price-main').textContent = price;
+    document.getElementById('fc-price-m2').textContent = m2 + ' / m²';
+
+    // Right rail
+    document.getElementById('fc-right-price').textContent = price;
+    document.getElementById('fc-right-m2').textContent = m2 + ' / m²';
+
+    // Description
+    document.getElementById('fc-desc').textContent = desc;
+
+    // Main image
+    document.getElementById('fc-main-img').src = afterImg;
+
+    // Reset before toggle
+    document.getElementById('fc-toggle').classList.remove('on');
+
+    // Commercial breakdown
+    document.getElementById('fc-bd-scope').textContent = scope;
+    const bdTier = document.getElementById('fc-bd-tier');
+    bdTier.innerHTML = '<span class="concept-tier ' + (tierClasses[tier] || 'tier-mid') + '">' + (tierLabels[tier] || tier) + '</span>';
+    document.getElementById('fc-bd-m2').textContent = m2 + ' / m²';
+    document.getElementById('fc-bd-total').textContent = price;
+
+    // Provider card
+    document.getElementById('fc-card-logo').textContent = initial;
+    document.getElementById('fc-card-logo').style.background = color;
+    document.getElementById('fc-card-name').textContent = provider;
+    document.getElementById('fc-card-scope').textContent = scope;
+    document.getElementById('fc-about-name').textContent = provider;
+
+    // Reset room tabs
+    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.fc-tab')[0].classList.add('active');
+    document.querySelectorAll('.fc-thumb').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.fc-thumb')[0].classList.add('active');
+
+    // Show modal
+    document.getElementById('fc-overlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeConcept() {
+    document.getElementById('fc-overlay').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  function fcOverlayClick(e) {
+    if (e.target === document.getElementById('fc-overlay')) closeConcept();
+  }
+
+  function toggleBefore() {
+    fcShowingBefore = !fcShowingBefore;
+    const img = document.getElementById('fc-main-img');
+    const toggle = document.getElementById('fc-toggle');
+    img.style.opacity = '0.4';
+    setTimeout(() => {
+      img.src = fcShowingBefore ? fcBeforeImg : fcAfterImg;
+      img.style.opacity = '1';
+    }, 150);
+    toggle.classList.toggle('on', fcShowingBefore);
+  }
+
+  function switchRoom(thumb, room, imgUrl) {
+    document.querySelectorAll('.fc-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+    document.querySelectorAll('.fc-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent.toLowerCase().includes(room));
+    });
+    fcAfterImg = imgUrl;
+    fcShowingBefore = false;
+    document.getElementById('fc-toggle').classList.remove('on');
+    const img = document.getElementById('fc-main-img');
+    img.style.opacity = '0.4';
+    setTimeout(() => { img.src = imgUrl; img.style.opacity = '1'; }, 150);
+  }
+
+  function switchRoomTab(tab, room, imgUrl) {
+    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.fc-thumb').forEach(t => {
+      const label = t.querySelector('.fc-thumb-label');
+      t.classList.toggle('active', label && label.textContent.toLowerCase().includes(room));
+    });
+    fcAfterImg = imgUrl;
+    fcShowingBefore = false;
+    document.getElementById('fc-toggle').classList.remove('on');
+    const img = document.getElementById('fc-main-img');
+    img.style.opacity = '0.4';
+    setTimeout(() => { img.src = imgUrl; img.style.opacity = '1'; }, 150);
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConcept(); });
+</script>
+
+</body>
+</html>
