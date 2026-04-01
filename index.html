@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reform-A.i | UI Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Red Hat Display', sans-serif; background: #fff; color: #0a0a0a; min-height: 100vh; }
+
+    .topbar { height: 64px; background: #fff; border-bottom: 0.625px solid #e5e5e5; display: flex; align-items: center; padding: 0 40px; }
+    .main { max-width: 900px; margin: 0 auto; padding: 60px 40px 100px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #00ADB5; margin-bottom: 12px; }
+    h1 { font-size: 32px; font-weight: 700; color: #0a0a0a; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .subtitle { font-size: 15px; color: #737373; margin-bottom: 48px; line-height: 1.6; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color .15s, transform .15s; display: block; }
+    .card:hover { border-color: #00ADB5; transform: translateY(-2px); }
+    .card-preview { height: 180px; overflow: hidden; position: relative; background: #f5f5f5; }
+    .card-preview iframe { width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; }
+    .card-body { padding: 16px; border-top: 1px solid #e5e5e5; }
+    .card-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #737373; margin-bottom: 4px; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0a0a0a; margin-bottom: 4px; }
+    .card-desc { font-size: 12px; color: #737373; line-height: 1.5; margin-bottom: 14px; }
+    .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00ADB5; }
+    .card-cta svg { width: 12px; height: 12px; transition: transform .15s; }
+    .card:hover .card-cta svg { transform: translateX(3px); }
+
+    .footer { text-align: center; margin-top: 60px; font-size: 12px; color: #a1a1a1; }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <svg width="148" height="38" viewBox="0 0 390 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M35 5L57 18V44L35 57L13 44V18Z" fill="#7BADB8"/>
+    <path d="M35 5L57 18L46 24V12Z" fill="#B0D4DC"/>
+    <path d="M57 18V44L46 38V24Z" fill="#5A93A2"/>
+    <path d="M35 14L51 23V41L35 50L19 41V23Z" fill="#4A8694"/>
+    <path d="M35 22L46 28V38L35 44L24 38V28Z" fill="#2d3748"/>
+    <path d="M27 41L32 24L35 31L38 24L43 41H39.5L35 31L30.5 41Z" fill="white"/>
+    <rect x="30.5" y="33" width="9" height="2.5" fill="#2d3748"/>
+    <circle cx="35" cy="23" r="2.2" fill="#6DB5C0"/>
+    <rect x="33.5" y="41" width="3" height="6" rx="1.5" fill="#6DB5C0"/>
+    <text x="70" y="38" font-family="'Red Hat Display',sans-serif" font-size="27" font-weight="700" fill="#2d3748" letter-spacing="-0.5">Reform-A.i</text>
+    <text x="70" y="53" font-family="'Red Hat Display',sans-serif" font-size="8.5" font-weight="400" fill="#9ca3af" letter-spacing="1.8">RENOVATION MADE EASY</text>
+  </svg>
+</header>
+
+<div class="main">
+  <div class="eyebrow">UI Mockups · Round 1</div>
+  <h1>Contractor &amp; Listing Flows</h1>
+  <p class="subtitle">Three interactive mockups for review. Click any card to open the full prototype — all interactions are live.</p>
+
+  <div class="cards">
+
+    <a class="card" href="reformai-listing-page.html">
+      <div class="card-preview">
+        <iframe src="reformai-listing-page.html" scrolling="no" tabindex="-1"></iframe>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Task 003 + 004</div>
+        <div class="card-title">Property Listing Page</div>
+        <div class="card-desc">Renovation Concepts grid, collapsible bid accordion, AI preview tool, and clickable Full Concept modal.</div>
+        <span class="card-cta">Open prototype <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </a>
+
+    <a class="card" href="reformai-bid-submit.html">
+      <div class="card-preview">
+        <iframe src="reformai-bid-submit.html" scrolling="no" tabindex="-1"></iframe>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Task 001</div>
+        <div class="card-title">Contractor Bid Submission</div>
+        <div class="card-desc">Trade tile selector, rate calculator, custom service write-in, and success modal with bid summary.</div>
+        <span class="card-cta">Open prototype <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </a>
+
+    <a class="card" href="reformai-homeowner-bids-dashboard.html">
+      <div class="card-preview">
+        <iframe src="reformai-homeowner-bids-dashboard.html" scrolling="no" tabindex="-1"></iframe>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Task 002</div>
+        <div class="card-title">Homeowner Bids Dashboard</div>
+        <div class="card-desc">Trade group tables with Schedule toggle, thumbs decisions, live search, and Other category for custom services.</div>
+        <span class="card-cta">Open prototype <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="footer">Reform-A.i · UI Design Review · Round 1 · March 2026</div>
+</div>
+
+</body>
+</html>
